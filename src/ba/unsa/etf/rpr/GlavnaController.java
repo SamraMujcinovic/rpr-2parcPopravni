@@ -15,7 +15,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.beans.XMLEncoder;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -144,7 +146,23 @@ public class GlavnaController {
         }
     }
 
-    // Metoda za potrebe testova, vraća bazu u polazno stanje
+    public void actionZapisi(ActionEvent actionEvent) {
+        Geografija g = new Geografija();
+        g.setDrzaveGeografija(dao.drzave());
+        g.setGradoviGeografija(dao.gradovi());
+
+            try {
+
+                XMLEncoder izlaz = new XMLEncoder(new FileOutputStream("geografija.xml"));
+
+                izlaz.writeObject(g);
+                izlaz.close();
+            } catch(Exception e) {
+                System.out.println("Greška: "+e);
+            }
+    }
+
+        // Metoda za potrebe testova, vraća bazu u polazno stanje
     public void resetujBazu() {
         GeografijaDAO.removeInstance();
         File dbfile = new File("baza.db");

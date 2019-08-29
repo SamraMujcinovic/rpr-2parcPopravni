@@ -1,8 +1,9 @@
-/*package ba.unsa.etf.rpr;
+package ba.unsa.etf.rpr;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -13,6 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+
+import java.beans.XMLDecoder;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -316,7 +325,7 @@ public class IspitGlavnaTest {
         }
 
         Grad sarajevo = null;
-        for (Grad g : geografija.getGradovi()) {
+        for (Grad g : geografija.getGradoviGeografija()) {
             if (g.getNaziv().equals("Sarajevo"))
                 sarajevo = g;
         }
@@ -325,4 +334,3 @@ public class IspitGlavnaTest {
         assertEquals("Bosna i Hercegovina", sarajevo.getDrzava().getNaziv());
     }
 }
-*/

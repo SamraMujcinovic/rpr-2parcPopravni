@@ -16,6 +16,7 @@ public class Grad {
     }
 
     public Grad() {
+        zagadjenost = 1;
     }
 
     public int getId() {
@@ -55,7 +56,7 @@ public class Grad {
     }
 
     public void setZagadjenost(int zagadjenost) {
-        if(zagadjenost < 1 || zagadjenost > 10)  throw new IllegalArgumentException();
+        if(zagadjenost < 1 || zagadjenost > 10)  throw new IllegalArgumentException("Neispravna zagadjenost " + zagadjenost);
         this.zagadjenost = zagadjenost;
     }
 

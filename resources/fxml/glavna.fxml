@@ -27,6 +27,8 @@
             <Button fx:id="btnDodajDrzavu" mnemonicParsing="false" prefWidth="Infinity" onAction="#actionDodajDrzavu" text="Dodaj državu" />
             <Button fx:id="btnIzmijeniGrad" mnemonicParsing="false" prefWidth="Infinity" onAction="#actionIzmijeniGrad" text="Izmijeni grad" />
             <Button fx:id="btnObrisiGrad" mnemonicParsing="false" prefWidth="Infinity" onAction="#actionObrisiGrad" text="Obriši grad" />
+             <Button fx:id="btnZapisi" mnemonicParsing="false" prefWidth="Infinity" onAction="#actionZapisi" text="Zapisi" />
+
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
