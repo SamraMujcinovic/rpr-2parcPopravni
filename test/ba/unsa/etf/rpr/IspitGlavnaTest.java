@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ApplicationExtension.class)
 public class IspitGlavnaTest {
-    Stage theStage;
+     Stage theStage;
     GlavnaController ctrl;
 
     @Start
@@ -40,7 +40,7 @@ public class IspitGlavnaTest {
 
 
     @Test
-    public void testDodajGradNadmorska(FxRobot robot) {
+    public void testDodajGradZagadjenost(FxRobot robot) {
         ctrl.resetujBazu();
 
         // Otvaranje forme za dodavanje
@@ -56,8 +56,8 @@ public class IspitGlavnaTest {
         robot.clickOn("#fieldBrojStanovnika");
         robot.write("350000");
 
-        robot.clickOn("#fieldNadmorskaVisina");
-        robot.write("550");
+        Slider sld = robot.lookup("#sliderZagadjenost").queryAs(Slider.class);
+        sld.setValue(9);
 
         // Klik na dugme Ok
         robot.clickOn("#btnOk");
@@ -66,21 +66,22 @@ public class IspitGlavnaTest {
         GeografijaDAO dao = GeografijaDAO.getInstance();
         assertEquals(6, dao.gradovi().size());
 
-        boolean pronadjeno = false;
+        Grad sarajevo = null;
         for(Grad grad : dao.gradovi())
-            if (grad.getNaziv().equals("Sarajevo") && grad.getNadmorskaVisina() == 550)
-                pronadjeno = true;
-        assertTrue(pronadjeno);
+            if (grad.getNaziv().equals("Sarajevo"))
+                sarajevo = grad;
+        assertNotNull(sarajevo);
+        assertEquals(9, sarajevo.getZagadjenost());
     }
 
     @Test
-    public void testIzmijeniGradNadmorska(FxRobot robot) {
+    public void testIzmijeniGradZagadjenost(FxRobot robot) {
         ctrl.resetujBazu();
 
-        // 250 ne smije biti default nadmorska visina za Graz jer je to "varanje"
+        // 7 ne smije biti default zagadjenost za Graz jer je to "varanje"
         GeografijaDAO dao = GeografijaDAO.getInstance();
         Grad graz = dao.nadjiGrad("Graz");
-        assertNotEquals(250, graz.getNadmorskaVisina());
+        assertNotEquals(7, graz.getZagadjenost());
 
         // Mijenjamo grad Graz
         robot.clickOn("Graz");
@@ -89,16 +90,15 @@ public class IspitGlavnaTest {
         // Čekamo da dijalog postane vidljiv
         robot.lookup("#fieldNaziv").tryQuery().isPresent();
 
-        robot.clickOn("#fieldNadmorskaVisina");
-        robot.press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
-        robot.write("250");
+        Slider sld = robot.lookup("#sliderZagadjenost").queryAs(Slider.class);
+        sld.setValue(7);
 
         // Klik na dugme Ok
         robot.clickOn("#btnOk");
 
         // Da li je promijenjen broj stanovnika Graza?
         graz = dao.nadjiGrad("Graz");
-        assertEquals(250, graz.getNadmorskaVisina());
+        assertEquals(7, graz.getZagadjenost());
     }
 
     @Test
@@ -112,8 +112,8 @@ public class IspitGlavnaTest {
         // Čekamo da dijalog postane vidljiv
         robot.lookup("#fieldNaziv").tryQuery().isPresent();
 
-        robot.clickOn("#fieldNadmorskaVisina");
-        robot.write("250");
+        Slider sld = robot.lookup("#sliderZagadjenost").queryAs(Slider.class);
+        sld.setValue(7);
 
         // Klik na dugme Ok
         robot.clickOn("#btnOk");
@@ -123,11 +123,206 @@ public class IspitGlavnaTest {
 
         boolean found = false;
         for (TableColumn column : tableViewGradovi.getColumns()) {
-            if (column.getText().equals("Nadmorska visina")) {
+            if (column.getText().equals("Zagađenost")) {
                 found = true;
             }
         }
         assertTrue(found);
+    }
+
+
+
+    @Test
+    public void testZapisi(FxRobot robot) {
+        ctrl.resetujBazu();
+
+        // Brišemo fajl ako postoji
+        File xml = new File("geografija.xml");
+        xml.delete();
+
+        robot.clickOn("#btnZapisi");
+
+        xml = new File("geografija.xml");
+        String content = "";
+        try {
+            content = new String(Files.readAllBytes(Paths.get(xml.getPath())));
+        } catch (IOException e) {
+            fail("Nije uspjelo čitanje XML datoteke");
+        }
+
+        assertTrue(content.contains("1899055"));
+        assertTrue(content.contains("Velika Britanija"));
+        assertTrue(content.contains("zagadjenost"));
+    }
+
+    @Test
+    public void testZapisiFormat(FxRobot robot) {
+        ctrl.resetujBazu();
+
+        // Brišemo fajl ako postoji
+        File xml = new File("geografija.xml");
+        xml.delete();
+
+        robot.clickOn("#btnZapisi");
+
+        xml = new File("geografija.xml");
+        String content = "";
+        try {
+            content = new String(Files.readAllBytes(Paths.get(xml.getPath())));
+        } catch (IOException e) {
+            fail("Nije uspjelo čitanje XML datoteke");
+        }
+
+        assertTrue(content.contains("<string>Beč</string>"));
+        assertTrue(content.contains("<string>Francuska</string>"));
+        assertTrue(content.contains("<int>8825000</int>"));
+        assertTrue(content.contains("<void property=\"zagadjenost\">"));
+        assertTrue(content.contains("<string>Graz</string>"));
+    }
+
+
+    @Test
+    public void testZapisiDodajGrad(FxRobot robot) {
+        ctrl.resetujBazu();
+
+        // Otvaranje forme za dodavanje
+        robot.clickOn("#btnDodajGrad");
+
+        // Čekamo da dijalog postane vidljiv
+        robot.lookup("#fieldNaziv").tryQuery().isPresent();
+
+        robot.clickOn("#fieldNaziv");
+        robot.write("Sarajevo");
+
+        robot.clickOn("#fieldBrojStanovnika");
+        robot.write("370000");
+
+        Slider sld = robot.lookup("#sliderZagadjenost").queryAs(Slider.class);
+        sld.setValue(9);
+
+        // Klik na dugme Ok
+        robot.clickOn("#btnOk");
+
+        // Brišemo fajl ako postoji
+        File xml = new File("geografija.xml");
+        xml.delete();
+
+        robot.clickOn("#btnZapisi");
+
+        xml = new File("geografija.xml");
+        String content = "";
+        try {
+            content = new String(Files.readAllBytes(Paths.get(xml.getPath())));
+        } catch (IOException e) {
+            fail("Nije uspjelo čitanje XML datoteke");
+        }
+
+        assertTrue(content.contains("Sarajevo"));
+        assertTrue(content.contains("370000"));
+        assertTrue(content.contains("<int>9</int>"));
+    }
+
+
+    @Test
+    public void testZapisiDodajDrzavu(FxRobot robot) {
+        ctrl.resetujBazu();
+
+        // Otvaranje forme za dodavanje
+        robot.clickOn("#btnDodajDrzavu");
+
+        // Čekamo da dijalog postane vidljiv
+        robot.lookup("#fieldNaziv").tryQuery().isPresent();
+
+        robot.clickOn("#fieldNaziv");
+        robot.write("Bosna i Hercegovina");
+
+        // Glavni grad će biti automatski izabran kao prvi
+
+        // Klik na dugme Ok
+        robot.clickOn("#btnOk");
+
+        // Brišemo fajl ako postoji
+        File xml = new File("geografija.xml");
+        xml.delete();
+
+        robot.clickOn("#btnZapisi");
+
+        xml = new File("geografija.xml");
+        String content = "";
+        try {
+            content = new String(Files.readAllBytes(Paths.get(xml.getPath())));
+        } catch (IOException e) {
+            fail("Nije uspjelo čitanje XML datoteke");
+        }
+
+        assertTrue(content.contains("Bosna i Hercegovina"));
+    }
+
+
+    @Test
+    public void testZapisiDodajDrzavuGradDeserijalizacija(FxRobot robot) {
+        ctrl.resetujBazu();
+
+        // Otvaranje forme za dodavanje
+        robot.clickOn("#btnDodajDrzavu");
+
+        // Čekamo da dijalog postane vidljiv
+        robot.lookup("#fieldNaziv").tryQuery().isPresent();
+
+        robot.clickOn("#fieldNaziv");
+        robot.write("Bosna i Hercegovina");
+
+        // Glavni grad će biti automatski izabran kao prvi
+
+        // Klik na dugme Ok
+        robot.clickOn("#btnOk");
+
+
+        // Otvaranje forme za dodavanje Grada
+        robot.clickOn("#btnDodajGrad");
+
+        // Čekamo da dijalog postane vidljiv
+        robot.lookup("#fieldNaziv").tryQuery().isPresent();
+
+        robot.clickOn("#fieldNaziv");
+        robot.write("Sarajevo");
+
+        // Biramo državu Bosna i Hercegovina
+        robot.clickOn("#choiceDrzava");
+        robot.clickOn("Bosna i Hercegovina");
+
+        robot.clickOn("#fieldBrojStanovnika");
+        robot.write("370000");
+
+        Slider sld = robot.lookup("#sliderZagadjenost").queryAs(Slider.class);
+        sld.setValue(9);
+
+        // Klik na dugme Ok
+        robot.clickOn("#btnOk");
+
+        // Brišemo fajl ako postoji
+        File xml = new File("geografija.xml");
+        xml.delete();
+
+        robot.clickOn("#btnZapisi");
+
+        Geografija geografija = null;
+        try {
+            XMLDecoder decoder = new XMLDecoder(new FileInputStream("geografija.xml"));
+            geografija = (Geografija)decoder.readObject();
+            decoder.close();
+        } catch (FileNotFoundException e) {
+            fail("Dekodiranje XML datoteke nije uspjelo");
+        }
+
+        Grad sarajevo = null;
+        for (Grad g : geografija.getGradovi()) {
+            if (g.getNaziv().equals("Sarajevo"))
+                sarajevo = g;
+        }
+
+        assertNotNull(sarajevo);
+        assertEquals("Bosna i Hercegovina", sarajevo.getDrzava().getNaziv());
     }
 }
 */

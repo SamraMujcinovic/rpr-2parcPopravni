@@ -1,4 +1,4 @@
-/*package ba.unsa.etf.rpr;
+package ba.unsa.etf.rpr;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,19 +13,34 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IspitDAOTest {
 
-    @Test
+     @Test
     void testGrad() {
         Grad grad = new Grad();
         grad.setNaziv("Sarajevo");
-        grad.setNadmorskaVisina(550);
-        assertEquals(550, grad.getNadmorskaVisina());
+        grad.setZagadjenost(6);
+        assertEquals(6, grad.getZagadjenost());
+    }
+
+    @Test
+    void testGradIzuzetak() {
+        Grad grad = new Grad();
+        grad.setNaziv("Sarajevo");
+        grad.setZagadjenost(8);
+        assertThrows(IllegalArgumentException.class, () -> grad.setZagadjenost(11));
+        assertEquals(8, grad.getZagadjenost());
     }
 
     @Test
     void testGradCtor() {
         Drzava drzava = new Drzava();
-        Grad grad = new Grad(0, "Sarajevo", 350000, drzava, 516); // Nadmorska visina je posljednji parametar
-        assertEquals(516, grad.getNadmorskaVisina());
+        Grad grad = new Grad(0, "Sarajevo", 350000, drzava, 4); // Zagađenost je posljednji parametar
+        assertEquals(4, grad.getZagadjenost());
+    }
+
+    @Test
+    void testGradCtorIzuzetak() {
+        Drzava drzava = new Drzava();
+        assertThrows(IllegalArgumentException.class, () -> { Grad grad= new Grad(0, "Sarajevo", 350000, drzava, -3); });
     }
 
     @Test
@@ -36,16 +51,18 @@ public class IspitDAOTest {
 
         GeografijaDAO dao = GeografijaDAO.getInstance();
         Grad bech = dao.glavniGrad("Austrija");
-        bech.setNadmorskaVisina(128);
+        int zagadjenost = bech.getZagadjenost()+1;
+        if (zagadjenost == 11) zagadjenost=1;
+        bech.setZagadjenost(zagadjenost);
         dao.izmijeniGrad(bech);
 
         Grad b2 = dao.glavniGrad("Austrija");
-        assertEquals(128, b2.getNadmorskaVisina());
-        b2.setNadmorskaVisina(-50);
+        assertEquals(zagadjenost, b2.getZagadjenost());
+        b2.setZagadjenost(1);
         dao.izmijeniGrad(b2);
 
         Grad b3 = dao.glavniGrad("Austrija");
-        assertEquals(-50, b2.getNadmorskaVisina());
+        assertEquals(1, b2.getZagadjenost());
     }
 
     @Test
@@ -56,7 +73,7 @@ public class IspitDAOTest {
 
         GeografijaDAO dao = GeografijaDAO.getInstance();
         Drzava francuska = dao.nadjiDrzavu("Francuska");
-        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 550);
+        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 5);
 
         dao.dodajGrad(sarajevo);
 
@@ -67,9 +84,8 @@ public class IspitDAOTest {
         }
         assertNotNull(s2);
 
-        assertEquals(550, s2.getNadmorskaVisina());
+        assertEquals(5, s2.getZagadjenost());
     }
-
 
     @Test
     void testNadjiGrad() {
@@ -80,13 +96,13 @@ public class IspitDAOTest {
         GeografijaDAO dao = GeografijaDAO.getInstance();
         Drzava francuska = dao.nadjiDrzavu("Francuska");
 
-        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 520);
+        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 3);
         dao.dodajGrad(sarajevo);
 
         Grad s2 = dao.nadjiGrad("Sarajevo");
         assertNotNull(s2);
 
-        assertEquals(520, s2.getNadmorskaVisina());
+        assertEquals(3, s2.getZagadjenost());
     }
 
 
@@ -99,7 +115,7 @@ public class IspitDAOTest {
         GeografijaDAO dao = GeografijaDAO.getInstance();
         Drzava francuska = dao.nadjiDrzavu("Francuska");
 
-        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 490); // Nadmorska visina je posljednji parametar
+        Grad sarajevo = new Grad(0, "Sarajevo", 350000, francuska, 4); // Zagađenost je pozljednji parametar
         dao.dodajGrad(sarajevo);
 
         Grad s2 = dao.nadjiGrad("Sarajevo");
@@ -111,7 +127,7 @@ public class IspitDAOTest {
         Drzava d2 = dao.nadjiDrzavu("Bosna i Hercegovina");
 
         assertNotNull(d2);
-        assertEquals(490, d2.getGlavniGrad().getNadmorskaVisina());
+        assertEquals(4, d2.getGlavniGrad().getZagadjenost());
     }
 
     @Test
@@ -131,15 +147,17 @@ public class IspitDAOTest {
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
             try {
-                PreparedStatement nadmorskaUpit = conn.prepareStatement("SELECT nadmorska_visina FROM grad WHERE id=1");
+                PreparedStatement nadmorskaUpit = conn.prepareStatement("SELECT zagadjenost FROM grad WHERE id=1");
                 nadmorskaUpit.execute();
                 conn.close();
             } catch (SQLException e) {
-                fail("Tabela grad ne sadrži kolonu nadmorska_visina");
+                fail("Tabela grad ne sadrži kolonu zagadjenost");
             }
         } catch (SQLException e) {
             fail("Datoteka sa bazom ne postoji ili je nedostupna");
         }
 
     }
-}*/
+
+
+}

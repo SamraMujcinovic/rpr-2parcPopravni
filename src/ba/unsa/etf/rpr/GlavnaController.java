@@ -27,6 +27,8 @@ public class GlavnaController {
     public TableColumn colGradId;
     public TableColumn colGradNaziv;
     public TableColumn colGradStanovnika;
+    public TableColumn colGradZagadjenost;
+
     public TableColumn<Grad,String> colGradDrzava;
     private GeografijaDAO dao;
     private ObservableList<Grad> listGradovi;
@@ -43,6 +45,8 @@ public class GlavnaController {
         colGradNaziv.setCellValueFactory(new PropertyValueFactory("naziv"));
         colGradStanovnika.setCellValueFactory(new PropertyValueFactory("brojStanovnika"));
         colGradDrzava.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDrzava().getNaziv()));
+        colGradZagadjenost.setCellValueFactory(new PropertyValueFactory("zagadjenost"));
+
     }
 
     public void actionDodajGrad(ActionEvent actionEvent) {
@@ -54,8 +58,8 @@ public class GlavnaController {
             loader.setController(gradController);
             root = loader.load();
             stage.setTitle("Grad");
-            stage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
-            stage.setResizable(false);
+            stage.setScene(new Scene(root, 500, 350));
+            //stage.setResizable(false);
             stage.show();
 
             stage.setOnHiding( event -> {
@@ -80,8 +84,8 @@ public class GlavnaController {
             loader.setController(drzavaController);
             root = loader.load();
             stage.setTitle("Država");
-            stage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
-            stage.setResizable(false);
+            stage.setScene(new Scene(root, 500, 350));
+            //stage.setResizable(false);
             stage.show();
 
             stage.setOnHiding( event -> {
@@ -108,8 +112,8 @@ public class GlavnaController {
             loader.setController(gradController);
             root = loader.load();
             stage.setTitle("Grad");
-            stage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
-            stage.setResizable(false);
+            stage.setScene(new Scene(root, 500, 350));
+            //stage.setResizable(false);
             stage.show();
 
             stage.setOnHiding( event -> {
